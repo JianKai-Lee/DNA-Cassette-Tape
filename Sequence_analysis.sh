@@ -30,16 +30,4 @@ seqtk trimfq -q 0.05 -l 21 Sample.fq.extendedFrags_trimend.fast_aptamer.fastq > 
 awk 'NR%4==2' Sample.trimmed.fastq | sort | uniq -c | sort -nr > Sample_sequence_counts.txt
 awk '{print $2}' Sample_sequence_counts.txt > Sample_sequence_sorted.txt
 
-#SNP analysis
-echo "SNP starts..."
-awk '{if ($12 == "NM:i:1") {print $0}}' Sample_snp.txt | awk '{if (/MD:Z:60/) {} else {print $0}}' > Sample_snp_1.txt
-awk '{if ($13~/A/) {print $10"\t"$13}}' Sample_snp_1.txt > Sample_snp_1_A.txt
-awk '{if ($13~/T/) {print $10"\t"$13}}' Sample_snp_1.txt > Sample_snp_1_T.txt
-awk '{if ($13~/C/) {print $10"\t"$13}}' Sample_snp_1.txt > Sample_snp_1_C.txt
-awk '{if ($13~/G/) {print $10"\t"$13}}' Sample_snp_1.txt > Sample_snp_1_G.txt
-python3 A.py Sample_snp_1_A.txt | sort | uniq -c >Sample_snp_1_A_num.txt
-python3 T.py Sample_snp_1_T.txt | sort | uniq -c >Sample_snp_1_T_num.txt
-python3 C.py Sample_snp_1_C.txt | sort | uniq -c >Sample_snp_1_C_num.txt
-python3 G.py Sample_snp_1_G.txt | sort | uniq -c >Sample_snp_1_G_num.txt
-
 echo "Program ends"

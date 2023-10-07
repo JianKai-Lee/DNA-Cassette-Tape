@@ -1,7 +1,7 @@
 echo "Program starts"
 
-#Prepare sequences without primers from raw data
-./flash2 Sample_1.fq.gz Sample_2.fq.gz -p 33 -r 100 -f 140 -s 100 -o Sample.fq
+#Prepare sequences without primers from raw data. All parameters you may need to adjust are in this block.
+./flash2 Sample_1.fq.gz Sample_2.fq.gz -p 33 -r 100 -f 140 -s 100 -o Sample.fq #If you do not have compatibility issues for flash2 and do not have an executable file in the folder, use "/flash2" instead of "./flash2" 
 cutadapt -a 'TCCCACCTACCTACAGAGCT' --discard-untrimmed -m 21 -o Sample.fq.extendedFrags_trimend.fastq Sample.fq.extendedFrags.fastq
 cutadapt -g 'TTCGGTGTTCAGGTCCTGGC' --discard-untrimmed -m 21 -o Sample.fq.extendedFrags_trimend.fast_aptamer.fastq Sample.fq.extendedFrags_trimend.fastq
 

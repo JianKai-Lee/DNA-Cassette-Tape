@@ -1,14 +1,11 @@
 echo "Program starts"
-echo "This is version 2_1 with auto delete and does not provide SNP analysis"
+
+#Prepare sequences without primers from raw data
 ./flash2 Sample_1.fq.gz Sample_2.fq.gz -p 33 -r 100 -f 140 -s 100 -o Sample.fq
-rm Sample_1.fq.gz Sample_2.fq.gz
-echo "Flash complete, unzipped files deleted!"
 cutadapt -a 'TCCCACCTACCTACAGAGCT' --discard-untrimmed -m 21 -o Sample.fq.extendedFrags_trimend.fastq Sample.fq.extendedFrags.fastq
-rm Sample.fq.extendedFrags.fastq
-echo "Untrimmed deleted 01"
 cutadapt -g 'TTCGGTGTTCAGGTCCTGGC' --discard-untrimmed -m 21 -o Sample.fq.extendedFrags_trimend.fast_aptamer.fastq Sample.fq.extendedFrags_trimend.fastq
-rm Sample.fq.extendedFrags_trimend.fastq
-echo "Untrimmed deleted 02"
+
+#Match the q30 sequences with the given pool
 bwa index pool.fasta
 echo "Start matching..."
 bwa mem pool.fasta Sample.fq.extendedFrags_trimend.fast_aptamer.fastq | samtools view -bSh -q 30 -@ 10 -o Sample_q30_addprimers.bam -
@@ -20,17 +17,29 @@ awk '{if (/\^/) {print $0}}' Sample_q30.sorted_addprimers.sam>Sample_delet.txt
 awk '{if (/SA:Z/) {print $0}}' Sample_q30.sorted_addprimers.sam >Sample_insert.txt
 awk '{if(/NM:i:0/) {} else {print $0}}' Sample_q30.sorted_addprimers.sam | awk '{if (/SA:Z/) {} else {print $0}}' | awk '{if (/\^/) {} else {print $0}}'>Sample_snp.txt
 awk '{if (/NM:i:0/) {print $0}}' Sample_q30.sorted_addprimers.sam >Sample_perfect_match.txt
-rm Sample_q30.sorted_addprimers.sam
-rm Sample_q30.sorted_addprimers.bam
-rm Sample_q30_addprimers.bam
+
+#Generate statistics
 awk '{print $1"\t"$3"\t"$10}' Sample_perfect_match.txt > Sample_perfect_match_chuli.txt
 awk '{print $2}' Sample_perfect_match_chuli.txt | uniq -c >Sample_perfect_match_statistics.txt
-echo "statistic complete!"
-echo "start counting reads..."
+
+#Prepare file for decoding
+echo "Start counting reads..."
 wc -l Sample.fq.extendedFrags_trimend.fast_aptamer.fastq | awk '{print $1/4}' > total_reads_count.txt
 echo "start preparing decoding file. This will take a while..."
 seqtk trimfq -q 0.05 -l 21 Sample.fq.extendedFrags_trimend.fast_aptamer.fastq > Sample.trimmed.fastq
 awk 'NR%4==2' Sample.trimmed.fastq | sort | uniq -c | sort -nr > Sample_sequence_counts.txt
 awk '{print $2}' Sample_sequence_counts.txt > Sample_sequence_sorted.txt
-rm Sample.trimmed.fastq
+
+#SNP analysis
+echo "SNP starts..."
+awk '{if ($12 == "NM:i:1") {print $0}}' Sample_snp.txt | awk '{if (/MD:Z:60/) {} else {print $0}}' > Sample_snp_1.txt
+awk '{if ($13~/A/) {print $10"\t"$13}}' Sample_snp_1.txt > Sample_snp_1_A.txt
+awk '{if ($13~/T/) {print $10"\t"$13}}' Sample_snp_1.txt > Sample_snp_1_T.txt
+awk '{if ($13~/C/) {print $10"\t"$13}}' Sample_snp_1.txt > Sample_snp_1_C.txt
+awk '{if ($13~/G/) {print $10"\t"$13}}' Sample_snp_1.txt > Sample_snp_1_G.txt
+python3 A.py Sample_snp_1_A.txt | sort | uniq -c >Sample_snp_1_A_num.txt
+python3 T.py Sample_snp_1_T.txt | sort | uniq -c >Sample_snp_1_T_num.txt
+python3 C.py Sample_snp_1_C.txt | sort | uniq -c >Sample_snp_1_C_num.txt
+python3 G.py Sample_snp_1_G.txt | sort | uniq -c >Sample_snp_1_G_num.txt
+
 echo "Program ends"

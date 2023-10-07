@@ -21,3 +21,5 @@ You may need to edit the lines in `Sequence_analysis.sh` to fit your data parame
 
 Open the folder in Terminal and run the command:  
 `./Sequence_analysis.sh`
+
+2023

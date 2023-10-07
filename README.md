@@ -3,10 +3,6 @@
 ## Sequence_analysis
 
 To run sequence analysis, put the following files in one folder:  
-`A.py`  (For SNP)  
-`T.py`  
-`C.py`  
-`G.py`  
 `Sequence_analysis.sh`  (Main codes in command lines) 
 
 In the same folder, you need to provide your data and rename as the following:  
@@ -21,5 +17,3 @@ You may need to edit the lines in `Sequence_analysis.sh` to fit your data parame
 
 Open the folder in Terminal and run the command:  
 `./Sequence_analysis.sh`
-
-2023

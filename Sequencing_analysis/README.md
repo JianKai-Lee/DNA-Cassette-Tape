@@ -16,4 +16,4 @@ In our tests, the program ran on a M1 chip MacBook. Due to the compatibility iss
 You may need to edit the lines in `Sequence_analysis.sh` to fit your data parameters to initiate an analysis.  
 
 Open the folder in Terminal and run the command:  
-`./Sequence_analysis.sh`
+`./Sequencing_analysis.sh`
